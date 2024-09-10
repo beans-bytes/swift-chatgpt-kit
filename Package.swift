@@ -5,22 +5,47 @@ import PackageDescription
 
 let package = Package(
     name: "swift-chatgpt-kit",
+    platforms: [
+        .iOS(.v13),
+        .macOS(.v10_15),
+        .watchOS(.v6),
+        .tvOS(.v13)
+    ],
     products: [
         .library(
-            name: "swift-chatgpt-kit",
-            targets: ["swift-chatgpt-kit"]),
+            name: "ChatGPTKit",
+            targets: ["ChatGPTKit"]),
     ],
     dependencies: [
         .package(
             url: "https://github.com/swift-server/async-http-client.git",
-            from: "1.16.0"
+            exact: "1.22.1"
         )
-    ]
+    ],
     targets: [
         .target(
-            name: "swift-chatgpt-kit"),
+            name: "ChatGPTKit",
+            dependencies: [
+                "Webservice"
+            ]
+        ),
         .testTarget(
-            name: "swift-chatgpt-kitTests",
-            dependencies: ["swift-chatgpt-kit"]),
+            name: "ChatGPTKitTests",
+            dependencies: [
+                "ChatGPTKit"
+            ]
+        ),
+        .target(
+            name: "Webservice",
+            dependencies: [
+                .product(name: "AsyncHTTPClient", package: "async-http-client")
+            ]
+        ),
+        .testTarget(
+            name: "WebserviceTests",
+            dependencies: [
+                
+            ]
+        ),
     ]
 )
