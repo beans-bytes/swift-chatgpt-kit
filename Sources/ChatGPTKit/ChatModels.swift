@@ -1,12 +1,80 @@
 import Foundation
 import Webservice
 
-struct ChatCompletionRequestMessage: Codable {
-    let role: String
-    let content: String
+public struct ChatCompletionRequest: Request, Codable {
+    public static let encoder = {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        return encoder
+    }()
+    
+    public let model: ChatModel
+    public let messages: [ChatCompletionMessage]
+    public let temperature: Double?
+    public let maxTokens: Int?
+    public let n: Int?
+    public let stop: [String]?
+    public let stream: Bool?
+    public let logitBias: [String: Int]?
+    public let presencePenalty: Double?
+    public let frequencyPenalty: Double?
+    
+    init(
+        model: ChatModel = .chatgpt4oLatest,
+        messages: [ChatCompletionMessage] = [],
+        temperature: Double? = 1,
+        maxTokens: Int? = 512,
+        n: Int? = 1,
+        stop: [String]? = nil,
+        stream: Bool? = false,
+        logitBias: [String : Int]? = nil,
+        presencePenalty: Double? = 0,
+        frequencyPenalty: Double? = 0
+    ) {
+        self.model = model
+        self.messages = messages
+        self.temperature = temperature
+        self.maxTokens = maxTokens
+        self.n = n
+        self.stop = stop
+        self.stream = stream
+        self.logitBias = logitBias
+        self.presencePenalty = presencePenalty
+        self.frequencyPenalty = frequencyPenalty
+    }
 }
 
-enum ChatModel: String, Codable {
+public struct ChatCompletionMessage: Codable {
+    public let role: ChatCompletionMessageUserRole
+    public let content: String
+    public let name: String?
+    public let refusal: String?
+    public let toolCalls: [ChatCompletionMessageToolCall]?
+}
+
+public enum ChatCompletionMessageUserRole: String, Codable {
+    case user
+    case system
+    case assistant
+    case tool
+}
+
+public struct ChatCompletionMessageToolCall: Codable {
+    public let id: String
+    public let type: ChatCompletionMessageToolCallType
+    public let function: ChatCompletionMessageToolFunction
+}
+
+public enum ChatCompletionMessageToolCallType: String, Codable {
+    case function
+}
+
+public struct ChatCompletionMessageToolFunction: Codable {
+    public let name: String
+    public let arguments: String // JSON Format
+}
+
+public enum ChatModel: String, Codable {
     case gpt4o = "gpt-4o"
     case gpt4o_20240513 = "gpt-4o-2024-05-13"
     case gpt4o_20240806 = "gpt-4o-2024-08-06"
@@ -15,38 +83,38 @@ enum ChatModel: String, Codable {
     case gpt4Turbo = "gpt-4-turbo"
 }
 
-struct CreateChatCompletionRequest: Codable {
-    let model: ChatModel
-    let messages: [ChatCompletionRequestMessage]
-    let temperature: Double?
-    let maxTokens: Int?
-    let n: Int?
-    let stop: [String]?
-    let stream: Bool?
-    let logitBias: [String: Int]?
-    let presencePenalty: Double?
-    let frequencyPenalty: Double?
+public struct ChatCompletionTokenLogprob: Codable {
+    public let token: String
+    public let logprob: Double
+    public let bytes: [Int]?
 }
 
-struct ChatCompletionTokenLogprob: Codable {
-    let token: String
-    let logprob: Double
-    let bytes: [Int]?
-}
-
-struct ChatCompletionChoice: Codable {
-    let finishReason: String
-    let index: Int
-    let message: ChatCompletionRequestMessage
-    let logprobs: [ChatCompletionTokenLogprob]?
-}
-
-struct CreateChatCompletionResponse: Response, Codable {
-    static let decoder = JSONDecoder()
+public struct ChatCompletionResponse: Response, Codable {
+    public static let decoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
     
-    let id: String
-    let choices: [ChatCompletionChoice]
-    let created: Int
-    let model: String
-    let object: String
+    public let id: String
+    public let choices: [ChatCompletionChoice]
+    public let created: Int
+    public let model: ChatModel
+    public let serviceTier: String?
+    public let systemFingerprint: String
+    public let object: String
+    public let usage: ChatCompletionUsage
+}
+
+public struct ChatCompletionChoice: Codable {
+    public let finishReason: String
+    public let index: Int
+    public let message: ChatCompletionMessage
+    public let logprobs: [ChatCompletionTokenLogprob]?
+}
+
+public struct ChatCompletionUsage: Codable {
+    public let promptTokens: Int
+    public let completionTokens: Int
+    public let totalTokens: Int
 }

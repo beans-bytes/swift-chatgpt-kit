@@ -7,12 +7,14 @@ public struct Endpoint<Output: Response> {
     let method: HTTPMethod
     let headers: [String: String]?
     let timeout: Int
+    let body: Data?
     
-    public init(url: String, method: HTTPMethod, headers: [String : String]?, timeout: Int = 15) {
+    public init(url: String, method: HTTPMethod, headers: [String : String]? = nil, body: Data? = nil, timeout: Int = 15) {
         self.url = url
         self.method = method
         self.headers = headers
         self.timeout = timeout
+        self.body = body
     }
 }
 
@@ -22,6 +24,9 @@ extension Endpoint {
         request.method = method
         headers?.forEach { name, value in
             request.headers.add(name: name, value: value)
+        }
+        if let body {
+            request.body = .bytes(.init(data: body))
         }
         return request
     }

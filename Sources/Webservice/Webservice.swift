@@ -2,6 +2,8 @@ import Foundation
 import AsyncHTTPClient
 
 public struct Webservice {
+    public init() { }
+    
     public func request<Output: Response>(endpoint: Endpoint<Output>) async throws -> Output {
         let request = try endpoint.asRequest()
         let response = try await HTTPClient.shared.execute(request, timeout: .seconds(Int64(endpoint.timeout)))
