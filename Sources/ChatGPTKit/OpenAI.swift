@@ -5,7 +5,7 @@ public struct OpenAI {
     let apiKey: String
     let webservice: Webservice
     
-    init(apiKey: String, webservice: Webservice = Webservice()) {
+    public init(apiKey: String, webservice: Webservice = Webservice()) {
         self.apiKey = apiKey
         self.webservice = webservice
     }
