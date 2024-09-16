@@ -19,7 +19,7 @@ public struct ChatCompletionRequest: Request, Codable {
     public let presencePenalty: Double?
     public let frequencyPenalty: Double?
     
-    init(
+    public init(
         model: ChatModel = .chatgpt4oLatest,
         messages: [ChatCompletionMessage] = [],
         temperature: Double? = 1,
@@ -50,6 +50,14 @@ public struct ChatCompletionMessage: Codable {
     public let name: String?
     public let refusal: String?
     public let toolCalls: [ChatCompletionMessageToolCall]?
+    
+    public init(role: ChatCompletionMessageUserRole, content: String, name: String?, refusal: String?, toolCalls: [ChatCompletionMessageToolCall]?) {
+        self.role = role
+        self.content = content
+        self.name = name
+        self.refusal = refusal
+        self.toolCalls = toolCalls
+    }
 }
 
 public enum ChatCompletionMessageUserRole: String, Codable {
@@ -63,6 +71,12 @@ public struct ChatCompletionMessageToolCall: Codable {
     public let id: String
     public let type: ChatCompletionMessageToolCallType
     public let function: ChatCompletionMessageToolFunction
+    
+    public init(id: String, type: ChatCompletionMessageToolCallType, function: ChatCompletionMessageToolFunction) {
+        self.id = id
+        self.type = type
+        self.function = function
+    }
 }
 
 public enum ChatCompletionMessageToolCallType: String, Codable {
@@ -72,6 +86,11 @@ public enum ChatCompletionMessageToolCallType: String, Codable {
 public struct ChatCompletionMessageToolFunction: Codable {
     public let name: String
     public let arguments: String // JSON Format
+    
+    public init(name: String, arguments: String) {
+        self.name = name
+        self.arguments = arguments
+    }
 }
 
 public enum ChatModel: String, CaseIterable, Codable {
@@ -87,6 +106,12 @@ public struct ChatCompletionTokenLogprob: Codable {
     public let token: String
     public let logprob: Double
     public let bytes: [Int]?
+    
+    public init(token: String, logprob: Double, bytes: [Int]?) {
+        self.token = token
+        self.logprob = logprob
+        self.bytes = bytes
+    }
 }
 
 public struct ChatCompletionResponse: Response, Codable {
@@ -104,6 +129,17 @@ public struct ChatCompletionResponse: Response, Codable {
     public let systemFingerprint: String
     public let object: String
     public let usage: ChatCompletionUsage
+    
+    public init(id: String, choices: [ChatCompletionChoice], created: Int, model: ChatModel, serviceTier: String?, systemFingerprint: String, object: String, usage: ChatCompletionUsage) {
+        self.id = id
+        self.choices = choices
+        self.created = created
+        self.model = model
+        self.serviceTier = serviceTier
+        self.systemFingerprint = systemFingerprint
+        self.object = object
+        self.usage = usage
+    }
 }
 
 public struct ChatCompletionChoice: Codable {
@@ -111,10 +147,23 @@ public struct ChatCompletionChoice: Codable {
     public let index: Int
     public let message: ChatCompletionMessage
     public let logprobs: [ChatCompletionTokenLogprob]?
+    
+    public init(finishReason: String, index: Int, message: ChatCompletionMessage, logprobs: [ChatCompletionTokenLogprob]?) {
+        self.finishReason = finishReason
+        self.index = index
+        self.message = message
+        self.logprobs = logprobs
+    }
 }
 
 public struct ChatCompletionUsage: Codable {
     public let promptTokens: Int
     public let completionTokens: Int
     public let totalTokens: Int
+    
+    public init(promptTokens: Int, completionTokens: Int, totalTokens: Int) {
+        self.promptTokens = promptTokens
+        self.completionTokens = completionTokens
+        self.totalTokens = totalTokens
+    }
 }
