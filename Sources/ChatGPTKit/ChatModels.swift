@@ -74,7 +74,7 @@ public struct ChatCompletionMessageToolFunction: Codable {
     public let arguments: String // JSON Format
 }
 
-public enum ChatModel: String, Codable {
+public enum ChatModel: String, CaseIterable, Codable {
     case gpt4o = "gpt-4o"
     case gpt4o_20240513 = "gpt-4o-2024-05-13"
     case gpt4o_20240806 = "gpt-4o-2024-08-06"
