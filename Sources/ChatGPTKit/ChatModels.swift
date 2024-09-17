@@ -60,6 +60,23 @@ public struct ChatCompletionMessage: Codable {
     }
 }
 
+public struct ChatCompletionMessageDelta: Codable {
+    public let role: ChatCompletionMessageUserRole?
+    public let content: String?
+    public let name: String?
+    public let refusal: String?
+    public let toolCalls: [ChatCompletionMessageToolCall]?
+    
+    public init(role: ChatCompletionMessageUserRole, content: String, name: String? = nil, refusal: String? = nil, toolCalls: [ChatCompletionMessageToolCall]? = nil) {
+        self.role = role
+        self.content = content
+        self.name = name
+        self.refusal = refusal
+        self.toolCalls = toolCalls
+    }
+}
+
+
 public enum ChatCompletionMessageUserRole: String, Codable {
     case user
     case system
@@ -152,6 +169,48 @@ public struct ChatCompletionChoice: Codable {
         self.finishReason = finishReason
         self.index = index
         self.message = message
+        self.logprobs = logprobs
+    }
+}
+
+public struct ChatCompletionStreamingResponse: Response, Codable {
+    public static let decoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
+    
+    public let id: String
+    public let choices: [ChatCompletionStreamingChoice]
+    public let created: Int
+    public let model: ChatModel
+    public let serviceTier: String?
+    public let systemFingerprint: String
+    public let object: String
+    public let usage: ChatCompletionUsage?
+    
+    public init(id: String, choices: [ChatCompletionStreamingChoice], created: Int, model: ChatModel, serviceTier: String?, systemFingerprint: String, object: String, usage: ChatCompletionUsage) {
+        self.id = id
+        self.choices = choices
+        self.created = created
+        self.model = model
+        self.serviceTier = serviceTier
+        self.systemFingerprint = systemFingerprint
+        self.object = object
+        self.usage = usage
+    }
+}
+
+public struct ChatCompletionStreamingChoice: Codable {
+    public let finishReason: String?
+    public let index: Int
+    public let delta: ChatCompletionMessageDelta
+    public let logprobs: [ChatCompletionTokenLogprob]?
+    
+    public init(finishReason: String?, index: Int, delta: ChatCompletionMessageDelta, logprobs: [ChatCompletionTokenLogprob]?) {
+        self.finishReason = finishReason
+        self.index = index
+        self.delta = delta
         self.logprobs = logprobs
     }
 }

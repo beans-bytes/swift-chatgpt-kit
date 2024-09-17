@@ -14,4 +14,11 @@ public struct OpenAI {
         let endpoint: Endpoint = try .chatCompletion(apiKey: apiKey, request: .init(model: model, messages: messages))
         return try await webservice.request(endpoint: endpoint)
     }
+    
+    public func createChatCompletionStream(model: ChatModel, messages: [ChatCompletionMessage]) throws -> AsyncThrowingStream<ChatCompletionStreamingResponse, Error> {
+        let endpoint: Endpoint = try .chatCompletionStreaming(
+            apiKey: apiKey, request: .init(model: model, messages: messages, stream: true)
+        )
+        return webservice.requestStreaming(endpoint: endpoint)
+    }
 }
