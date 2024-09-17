@@ -22,14 +22,14 @@ public struct ChatCompletionRequest: Request, Codable {
     public init(
         model: ChatModel = .chatgpt4oLatest,
         messages: [ChatCompletionMessage] = [],
-        temperature: Double? = 1,
-        maxTokens: Int? = 512,
-        n: Int? = 1,
+        temperature: Double? = nil,
+        maxTokens: Int? = nil,
+        n: Int? = nil,
         stop: [String]? = nil,
-        stream: Bool? = false,
+        stream: Bool? = nil,
         logitBias: [String : Int]? = nil,
-        presencePenalty: Double? = 0,
-        frequencyPenalty: Double? = 0
+        presencePenalty: Double? = nil,
+        frequencyPenalty: Double? = nil
     ) {
         self.model = model
         self.messages = messages
@@ -51,7 +51,7 @@ public struct ChatCompletionMessage: Codable {
     public let refusal: String?
     public let toolCalls: [ChatCompletionMessageToolCall]?
     
-    public init(role: ChatCompletionMessageUserRole, content: String, name: String?, refusal: String?, toolCalls: [ChatCompletionMessageToolCall]?) {
+    public init(role: ChatCompletionMessageUserRole, content: String, name: String? = nil, refusal: String? = nil, toolCalls: [ChatCompletionMessageToolCall]? = nil) {
         self.role = role
         self.content = content
         self.name = name

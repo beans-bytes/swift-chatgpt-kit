@@ -10,7 +10,9 @@ public struct Webservice {
     
     public func request<Output: Response>(endpoint: Endpoint<Output>) async throws -> Output {
         let request = try endpoint.asRequest()
+        print("request \(request)")
         let response = try await httpClient.execute(request, timeout: .seconds(Int64(endpoint.timeout)))
+        print("response \(response)")
         
         if response.status == .ok {
             let decoder = Output.decoder

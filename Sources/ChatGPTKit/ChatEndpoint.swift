@@ -9,6 +9,8 @@ extension Endpoint where Output == ChatCompletionResponse {
         
         let encoder = ChatCompletionRequest.encoder
         let data = try encoder.encode(request)
+        
+        print("data \(String(data: data, encoding: .utf8))")
                 
         return Endpoint<Output>(
             url: "https://api.openai.com/v1/chat/completions",
