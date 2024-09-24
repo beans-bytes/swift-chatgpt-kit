@@ -226,3 +226,24 @@ public struct ChatCompletionUsage: Codable {
         self.totalTokens = totalTokens
     }
 }
+
+public struct TranscriptionResponse: Response, Codable {
+    public static let decoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
+    
+    public let task: String
+    public let language: String
+    public let duration: Double
+    public let text: String
+    public let words: [Word]
+}
+
+public struct Word: Codable {
+    public let word: String
+    public let start: Double
+    public let end: Double
+}
+

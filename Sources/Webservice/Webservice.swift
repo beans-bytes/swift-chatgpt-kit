@@ -1,59 +1,61 @@
 import Foundation
-import AsyncHTTPClient
 
 public struct Webservice {
-    private let httpClient: HTTPClient
-    
-    public init(httpClient: HTTPClient = .shared) {
-        self.httpClient = httpClient
+    private let session: URLSession
+
+    public init(session: URLSession = .shared) {
+        self.session = session
     }
-    
+
     public func request<Output: Response>(endpoint: Endpoint<Output>) async throws -> Output {
-        let request = try endpoint.asRequest()
-        let response = try await httpClient.execute(request, timeout: .seconds(Int64(endpoint.timeout)))
-        
-        if response.status == .ok {
+        let urlRequest = try endpoint.asURLRequest()
+        print("Request: \(urlRequest)")
+
+        let (data, response) = try await session.data(for: urlRequest)
+        print("Response: \(response)")
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw WebserviceError.invalidResponse
+        }
+
+        if httpResponse.statusCode == 200 {
             let decoder = Output.decoder
-            let tenMegaBytes = 1024 * 1024 * 10
-            let body = try await response.body.collect(upTo: tenMegaBytes)
-            return try decoder.decode(Output.self, from: body)
+            return try decoder.decode(Output.self, from: data)
         } else {
-            throw WebserviceError.invalidStatusCode(Int(response.status.code))
+            throw WebserviceError.invalidStatusCode(httpResponse.statusCode)
         }
     }
-    
+
     public func requestStreaming<Output: Response>(endpoint: Endpoint<Output>) -> AsyncThrowingStream<Output, Error> {
         AsyncThrowingStream { continuation in
             Task {
                 do {
-                    let request = try endpoint.asRequest()
-                    let response = try await httpClient.execute(request, timeout: .seconds(Int64(endpoint.timeout)))
-                    
-                    if response.status == .ok {
-                        for try await chunk in response.body {
-                            let chunkString = String(buffer: chunk)
+                    let urlRequest = try endpoint.asURLRequest()
+                    let (bytes, response) = try await session.bytes(for: urlRequest)
 
-                            let lines = chunkString.split(separator: "\n")
-                            
-                            for line in lines {
-                                if line.hasPrefix("data: ") {
-                                    let jsonData = line.dropFirst(6).trimmingCharacters(in: .whitespacesAndNewlines)
-                                    
-                                    if jsonData == "[DONE]" {
-                                        continuation.finish()
-                                        return
-                                    }
-                                    
-                                    if let data = jsonData.data(using: .utf8) {
-                                        let decoder = Output.decoder
-                                        let response = try decoder.decode(Output.self, from: data)
-                                        continuation.yield(response)
-                                    }
+                    guard let httpResponse = response as? HTTPURLResponse else {
+                        throw WebserviceError.invalidResponse
+                    }
+
+                    if httpResponse.statusCode == 200 {
+                        for try await line in bytes.lines {
+                            if line.hasPrefix("data: ") {
+                                let jsonDataString = line.dropFirst(6).trimmingCharacters(in: .whitespacesAndNewlines)
+
+                                if jsonDataString == "[DONE]" {
+                                    continuation.finish()
+                                    return
+                                }
+
+                                if let data = jsonDataString.data(using: .utf8) {
+                                    let decoder = Output.decoder
+                                    let response = try decoder.decode(Output.self, from: data)
+                                    continuation.yield(response)
                                 }
                             }
                         }
                     } else {
-                        throw WebserviceError.invalidStatusCode(Int(response.status.code))
+                        throw WebserviceError.invalidStatusCode(httpResponse.statusCode)
                     }
                 } catch {
                     continuation.finish(throwing: error)
