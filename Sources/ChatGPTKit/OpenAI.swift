@@ -73,7 +73,7 @@ public struct OpenAI {
         formData.addFile(
             data: fileData,
             name: "file",
-            fileName: fileUrl.lastPathComponent,
+            fileName: "audio.m4a",
             mimeType: "audio/mp4"
         )
         

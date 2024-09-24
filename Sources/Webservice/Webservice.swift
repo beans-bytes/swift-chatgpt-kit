@@ -11,7 +11,6 @@ public struct Webservice {
         let urlRequest = try endpoint.asURLRequest()
 
         let (data, response) = try await session.data(for: urlRequest)
-        print("body: \(String(data: data, encoding: .ascii))")
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw WebserviceError.invalidResponse
