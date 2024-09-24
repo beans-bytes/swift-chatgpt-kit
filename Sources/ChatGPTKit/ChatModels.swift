@@ -234,11 +234,11 @@ public struct TranscriptionResponse: Response, Codable {
         return decoder
     }()
     
-    public let task: String
-    public let language: String
-    public let duration: Double
+    public let task: String?
+    public let language: String?
+    public let duration: Double?
     public let text: String
-    public let words: [Word]
+    public let words: [Word]?
 }
 
 public struct Word: Codable {

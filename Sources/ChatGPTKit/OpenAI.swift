@@ -66,30 +66,26 @@ public struct OpenAI {
         
         let fileData = try Data(contentsOf: fileUrl)
         
-        let parameters: [String: Any] = [
-            "timestamp_granularities[]": ["word"],
-            "model": "whisper-1",
-            "response_format": "verbose_json"
-        ]
-
-        let boundary = "Boundary-\(UUID().uuidString)"
+        var formData = MultipartFormData()
+        formData.addParameters(name: "timestamp_granularities[]", values: ["word"])
+        formData.addParameter(name: "model", value: "whisper-1")
+        formData.addParameter(name: "response_format", value: "verbose_json")
+        formData.addFile(
+            data: fileData,
+            name: "file",
+            fileName: fileUrl.lastPathComponent,
+            mimeType: "audio/mp4"
+        )
         
         let endpoint = Endpoint<TranscriptionResponse>(
             url: URL(string: "https://api.openai.com/v1/audio/transcriptions")!,
-            timeout: 60,
+            timeout: 15,
             method: "POST",
             headers: [
-                "Content-Type": "multipart/form-data; boundary=\(boundary)",
+                "Content-Type": formData.contentType,
                 "Authorization": "Bearer \(apiKey)"
             ],
-            body: createMultipartFormData(
-                parameters: parameters,
-                fileData: fileData,
-                fileFieldName: "file",
-                fileName: "audio.m4a",
-                mimeType: "audio/m4a",
-                boundary: boundary
-            )
+            body: formData.finalize()
         )
         return try await webservice.request(endpoint: endpoint)
     }
@@ -105,50 +101,5 @@ public struct OpenAI {
             throw ChatGPTKitError.invalidBaseURL
         }
         return url
-    }
-    
-    private func createMultipartFormData(
-        parameters: [String: Any],
-        fileData: Data,
-        fileFieldName: String,
-        fileName: String,
-        mimeType: String,
-        boundary: String
-    ) -> Data {
-        var body = Data()
-        
-        // Add parameters
-        for (key, value) in parameters {
-            if let array = value as? [Any] {
-                for element in array {
-                    body.append("--\(boundary)\r\n")
-                    body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
-                    body.append("\(element)\r\n")
-                }
-            } else {
-                body.append("--\(boundary)\r\n")
-                body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
-                body.append("\(value)\r\n")
-            }
-        }
-        
-        // Add file data
-        body.append("--\(boundary)\r\n")
-        body.append("Content-Disposition: form-data; name=\"\(fileFieldName)\"; filename=\"\(fileName)\"\r\n")
-        body.append("Content-Type: \(mimeType)\r\n\r\n")
-        body.append(fileData)
-        body.append("\r\n")
-        
-        // Close boundary
-        body.append("--\(boundary)--\r\n")
-        return body
-    }
-}
-
-extension Data {
-    mutating func append(_ string: String) {
-        if let data = string.data(using: .utf8) {
-            append(data)
-        }
     }
 }

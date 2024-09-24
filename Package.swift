@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "swift-chatgpt-kit",
     platforms: [
-        .iOS(.v15),
+        .iOS(.v15)
     ],
     products: [
         .library(

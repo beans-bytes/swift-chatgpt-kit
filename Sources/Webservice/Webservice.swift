@@ -9,10 +9,9 @@ public struct Webservice {
 
     public func request<Output: Response>(endpoint: Endpoint<Output>) async throws -> Output {
         let urlRequest = try endpoint.asURLRequest()
-        print("Request: \(urlRequest)")
 
         let (data, response) = try await session.data(for: urlRequest)
-        print("Response: \(response)")
+        print("body: \(String(data: data, encoding: .ascii))")
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw WebserviceError.invalidResponse
