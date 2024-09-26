@@ -58,7 +58,10 @@ public struct OpenAI {
         return webservice.requestStreaming(endpoint: endpoint)
     }
     
-    public func createAudioTranscription(fileUrl: URL) async throws -> TranscriptionResponse {
+    ///
+    /// - Parameters:
+    ///  -  language: Language Code per ISO 639 Defintition s, [Wikipedia](https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes)
+    public func createAudioTranscription(fileUrl: URL, language iso639: String?) async throws -> TranscriptionResponse {
         try validateAPIKey(apiKey: apiKey)
         
         var url = try validateBaseUrl(baseURL: baseUrl)
@@ -70,6 +73,9 @@ public struct OpenAI {
         formData.addParameters(name: "timestamp_granularities[]", values: ["word"])
         formData.addParameter(name: "model", value: "whisper-1")
         formData.addParameter(name: "response_format", value: "verbose_json")
+        if let iso639 {
+            formData.addParameter(name: "language", value: iso639)
+        }
         formData.addFile(
             data: fileData,
             name: "file",
