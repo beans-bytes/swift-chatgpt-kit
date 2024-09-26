@@ -23,7 +23,6 @@ public struct OpenAI {
                 
         let endpoint = Endpoint<ChatCompletionResponse>(
             url: url,
-            timeout: 2, 
             method: "POST",
             headers: [
                 "Content-Type": "application/json",
@@ -46,7 +45,6 @@ public struct OpenAI {
         
         let endpoint = Endpoint<ChatCompletionStreamingResponse>(
             url: url,
-            timeout: 2, 
             method: "POST",
             headers: [
                 "Content-Type": "application/json",
@@ -85,7 +83,6 @@ public struct OpenAI {
         
         let endpoint = Endpoint<TranscriptionResponse>(
             url: URL(string: "https://api.openai.com/v1/audio/transcriptions")!,
-            timeout: 15,
             method: "POST",
             headers: [
                 "Content-Type": formData.contentType,

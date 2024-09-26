@@ -7,7 +7,7 @@ public struct Endpoint<Output: Response> {
     let headers: [String: String]
     let body: Data?
     
-    public init(url: URL, timeout: TimeInterval, method: String, headers: [String : String], body: Data?) {
+    public init(url: URL, timeout: TimeInterval = 15, method: String, headers: [String : String], body: Data?) {
         self.url = url
         self.timeout = timeout
         self.method = method
