@@ -93,6 +93,28 @@ public struct OpenAI {
         return try await webservice.request(endpoint: endpoint)
     }
     
+    public func createSpeech(input: String, voice: Voice) async throws -> Data {
+        try validateAPIKey(apiKey: apiKey)
+        
+        var url = try validateBaseUrl(baseURL: baseUrl)
+        url.appendPathComponent("audio/speech")
+        let completionRequest = SpeechRequest(input: input, voice: voice)
+        let encoder = SpeechRequest.encoder
+        let data = try encoder.encode(completionRequest)
+                
+        let endpoint = Endpoint<Data>(
+            url: url,
+            method: "POST",
+            headers: [
+                "Content-Type": "application/json",
+                "Authorization": "Bearer \(apiKey)"
+            ],
+            body: data
+        )
+        
+        return try await webservice.request(endpoint: endpoint)
+    }
+    
     private func validateAPIKey(apiKey: String) throws {
         guard !apiKey.isEmpty else {
             throw ChatGPTKitError.invalidApiToken

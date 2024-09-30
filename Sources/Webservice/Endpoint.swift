@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Endpoint<Output: Response> {
+public struct Endpoint<Output> {
     let url: URL
     let timeout: TimeInterval
     let method: String

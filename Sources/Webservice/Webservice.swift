@@ -23,6 +23,22 @@ public struct Webservice {
             throw WebserviceError.invalidStatusCode(httpResponse.statusCode)
         }
     }
+    
+    public func request(endpoint: Endpoint<Data>) async throws -> Data {
+        let urlRequest = try endpoint.asURLRequest()
+
+        let (data, response) = try await session.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw WebserviceError.invalidResponse
+        }
+
+        if httpResponse.statusCode == 200 {
+            return data
+        } else {
+            throw WebserviceError.invalidStatusCode(httpResponse.statusCode)
+        }
+    }
 
     public func requestStreaming<Output: Response>(endpoint: Endpoint<Output>) -> AsyncThrowingStream<Output, Error> {
         AsyncThrowingStream { continuation in

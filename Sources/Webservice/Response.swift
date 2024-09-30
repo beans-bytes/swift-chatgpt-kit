@@ -1,9 +1,9 @@
 import Foundation
 
-public protocol Response: Codable {
+public protocol Response: Decodable {
     static var decoder: JSONDecoder { get }
 }
 
-public protocol Request: Codable {
+public protocol Request: Encodable {
     static var encoder: JSONEncoder { get }
 }

@@ -1,7 +1,7 @@
 import Foundation
 import Webservice
 
-public struct ChatCompletionRequest: Request, Codable {
+public struct ChatCompletionRequest: Request {
     public static let encoder = {
         let encoder = JSONEncoder()
         encoder.keyEncodingStrategy = .convertToSnakeCase
@@ -227,7 +227,7 @@ public struct ChatCompletionUsage: Codable {
     }
 }
 
-public struct TranscriptionResponse: Response, Codable {
+public struct TranscriptionResponse: Response {
     public static let decoder = {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -247,3 +247,45 @@ public struct Word: Codable {
     public let end: Double
 }
 
+public struct SpeechRequest: Request {
+    public static let encoder = {
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
+        return encoder
+    }()
+    
+    public init(model: SpeechModel = .tts1, input: String, voice: Voice = .alloy, responseFormat: ResponseFormat = .mp3, speed: Double = 1.0) {
+        self.model = model
+        self.input = input
+        self.voice = voice
+        self.responseFormat = responseFormat
+        self.speed = speed
+    }
+    
+    public let model: SpeechModel
+    public let input: String
+    public let voice: Voice
+    public let responseFormat: ResponseFormat?
+    public let speed: Double?
+}
+
+public enum SpeechModel: String, Encodable {
+    case tts1 = "tts-1"
+    case tts1HD = "tts-1-hd"
+}
+
+public enum Voice: String, Encodable {
+    case alloy, echo, fable, onyx, nova, shimmer
+}
+
+public enum ResponseFormat: String, Encodable {
+    case mp3, opus, aac, flac, wav, pcm
+}
+
+public struct SpeechResponse: Response, Codable {
+    public static let decoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
+}
