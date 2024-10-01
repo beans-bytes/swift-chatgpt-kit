@@ -254,7 +254,7 @@ public struct SpeechRequest: Request {
         return encoder
     }()
     
-    public init(model: SpeechModel = .tts1, input: String, voice: Voice = .alloy, responseFormat: ResponseFormat = .mp3, speed: Double = 1.0) {
+    public init(model: SpeechModel, input: String, voice: Voice, responseFormat: ResponseFormat?, speed: Double?) {
         self.model = model
         self.input = input
         self.voice = voice

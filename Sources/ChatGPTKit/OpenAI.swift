@@ -93,12 +93,12 @@ public struct OpenAI {
         return try await webservice.request(endpoint: endpoint)
     }
     
-    public func createSpeech(input: String, voice: Voice) async throws -> Data {
+    public func createSpeech(model: SpeechModel = .tts1, input: String, voice: Voice = .alloy, responseFormat: ResponseFormat? = .mp3, speed: Double? = 1.5) async throws -> Data {
         try validateAPIKey(apiKey: apiKey)
         
         var url = try validateBaseUrl(baseURL: baseUrl)
         url.appendPathComponent("audio/speech")
-        let completionRequest = SpeechRequest(input: input, voice: voice)
+        let completionRequest = SpeechRequest(model: model, input: input, voice: voice, responseFormat: responseFormat, speed: speed)
         let encoder = SpeechRequest.encoder
         let data = try encoder.encode(completionRequest)
                 
