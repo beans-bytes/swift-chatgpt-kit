@@ -12,12 +12,12 @@ public struct OpenAI {
         self.webservice = webservice
     }
     
-    public func createChatCompletion(model: ChatModel, messages: [ChatCompletionMessage]) async throws -> ChatCompletionResponse {
+    public func createChatCompletion(model: ChatModel, messages: [ChatCompletionMessage], jsonSchema: String?) async throws -> ChatCompletionResponse {
         try validateAPIKey(apiKey: apiKey)
         
         var url = try validateBaseUrl(baseURL: baseUrl)
         url.appendPathComponent("chat/completions")
-        let completionRequest = ChatCompletionRequest(model: model, messages: messages, stream: false)
+        let completionRequest = ChatCompletionRequest(model: model, messages: messages, stream: false, jsonSchema: jsonSchema)
         let encoder = ChatCompletionRequest.encoder
         let data = try encoder.encode(completionRequest)
                 
