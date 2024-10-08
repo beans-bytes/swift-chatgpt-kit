@@ -18,6 +18,7 @@ public struct ChatCompletionRequest: Request {
     public let logitBias: [String: Int]?
     public let presencePenalty: Double?
     public let frequencyPenalty: Double?
+    public let responseFormat: String?
     
     public init(
         model: ChatModel = .chatgpt4oLatest,
@@ -29,7 +30,8 @@ public struct ChatCompletionRequest: Request {
         stream: Bool? = nil,
         logitBias: [String : Int]? = nil,
         presencePenalty: Double? = nil,
-        frequencyPenalty: Double? = nil
+        frequencyPenalty: Double? = nil,
+        jsonSchema: String? = nil
     ) {
         self.model = model
         self.messages = messages
@@ -41,6 +43,17 @@ public struct ChatCompletionRequest: Request {
         self.logitBias = logitBias
         self.presencePenalty = presencePenalty
         self.frequencyPenalty = frequencyPenalty
+        
+        if let jsonSchema {
+            self.responseFormat = """
+            {
+                "type": "json_schema",
+                "json_schema": \(jsonSchema)
+            }
+            """
+        } else {
+            self.responseFormat = nil
+        }
     }
 }
 
