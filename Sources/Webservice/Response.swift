@@ -5,5 +5,5 @@ public protocol Response: Decodable {
 }
 
 public protocol Request: Encodable {
-    static var encoder: JSONEncoder { get }
+
 }

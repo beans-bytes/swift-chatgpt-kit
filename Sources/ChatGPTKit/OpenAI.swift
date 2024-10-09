@@ -12,13 +12,13 @@ public struct OpenAI {
         self.webservice = webservice
     }
     
-    public func createChatCompletion(model: ChatModel, messages: [ChatCompletionMessage], jsonSchema: String?) async throws -> ChatCompletionResponse {
+    public func createChatCompletion(model: ChatModel, messages: [ChatCompletionMessage], responseFormat: ResponseFormat? = nil) async throws -> ChatCompletionResponse {
         try validateAPIKey(apiKey: apiKey)
         
         var url = try validateBaseUrl(baseURL: baseUrl)
         url.appendPathComponent("chat/completions")
-        let completionRequest = ChatCompletionRequest(model: model, messages: messages, stream: false, jsonSchema: jsonSchema)
-        let encoder = ChatCompletionRequest.encoder
+        let completionRequest = ChatCompletionRequest(model: model, messages: messages, stream: false, responseFormat: responseFormat)
+        let encoder = JSONEncoder()
         let data = try encoder.encode(completionRequest)
                 
         let endpoint = Endpoint<ChatCompletionResponse>(
@@ -40,7 +40,7 @@ public struct OpenAI {
         var url = try validateBaseUrl(baseURL: baseUrl)
         url.appendPathComponent("chat/completions")
         let completionStreamingRequest = ChatCompletionRequest(model: model, messages: messages, stream: true)
-        let encoder = ChatCompletionRequest.encoder
+        let encoder = JSONEncoder()
         let data = try encoder.encode(completionStreamingRequest)
         
         let endpoint = Endpoint<ChatCompletionStreamingResponse>(
@@ -93,13 +93,13 @@ public struct OpenAI {
         return try await webservice.request(endpoint: endpoint)
     }
     
-    public func createSpeech(model: SpeechModel = .tts1, input: String, voice: Voice = .alloy, responseFormat: ResponseFormat? = .mp3, speed: Double? = 1.5) async throws -> Data {
+    public func createSpeech(model: SpeechModel = .tts1, input: String, voice: Voice = .alloy, responseFormat: AudioFormat? = .mp3, speed: Double? = 1.5) async throws -> Data {
         try validateAPIKey(apiKey: apiKey)
         
         var url = try validateBaseUrl(baseURL: baseUrl)
         url.appendPathComponent("audio/speech")
         let completionRequest = SpeechRequest(model: model, input: input, voice: voice, responseFormat: responseFormat, speed: speed)
-        let encoder = SpeechRequest.encoder
+        let encoder = JSONEncoder()
         let data = try encoder.encode(completionRequest)
                 
         let endpoint = Endpoint<Data>(

@@ -16,6 +16,9 @@ public struct Webservice {
             throw WebserviceError.invalidResponse
         }
 
+        print("request \(String(data: urlRequest.httpBody!, encoding: .utf8))")
+        print("response \(String(data: data, encoding: .utf8))")
+        
         if httpResponse.statusCode == 200 {
             let decoder = Output.decoder
             return try decoder.decode(Output.self, from: data)
