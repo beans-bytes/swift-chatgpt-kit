@@ -164,12 +164,10 @@ public struct ChatCompletionMessageToolFunction: Codable {
 }
 
 public enum ChatModel: String, CaseIterable, Codable {
-    case gpt4o = "gpt-4o"
-    case gpt4o_20240513 = "gpt-4o-2024-05-13"
     case gpt4o_20240806 = "gpt-4o-2024-08-06"
     case chatgpt4oLatest = "chatgpt-4o-latest"
-    case gpt4oMini = "gpt-4o-mini"
-    case gpt4Turbo = "gpt-4-turbo"
+    case gpt4oMini_20240718 = "gpt-4o-mini-2024-07-18"
+    case gpt4Turbo_20240409 = "gpt-4-turbo-2024-04-09"
 }
 
 public struct ChatCompletionTokenLogprob: Codable {
@@ -421,12 +419,12 @@ public struct SpeechRequest: Request {
     }
 }
 
-public enum SpeechModel: String, Encodable {
+public enum SpeechModel: String, CaseIterable, Hashable, Encodable {
     case tts1 = "tts-1"
     case tts1HD = "tts-1-hd"
 }
 
-public enum Voice: String, Encodable {
+public enum Voice: String, CaseIterable, Hashable, Encodable {
     case alloy, echo, fable, onyx, nova, shimmer
 }
 
